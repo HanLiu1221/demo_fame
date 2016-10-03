@@ -35,9 +35,10 @@
             this.run = new System.Windows.Forms.ToolStripButton();
             this.modelViewLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.viewPanel = new System.Windows.Forms.Panel();
-            this.viewlLabel = new System.Windows.Forms.Label();
             this.threeDViewPanel = new System.Windows.Forms.Panel();
+            this.viewlLabel = new System.Windows.Forms.Label();
             this.glViewer = new FameBase.GLViewer();
+            this.addUser = new System.Windows.Forms.ToolStripButton();
             this.menu.SuspendLayout();
             this.viewPanel.SuspendLayout();
             this.threeDViewPanel.SuspendLayout();
@@ -47,6 +48,7 @@
             // 
             this.menu.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addUser,
             this.set_1,
             this.set_2,
             this.run});
@@ -111,6 +113,16 @@
             this.viewPanel.Size = new System.Drawing.Size(796, 542);
             this.viewPanel.TabIndex = 17;
             // 
+            // threeDViewPanel
+            // 
+            this.threeDViewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.threeDViewPanel.Controls.Add(this.viewlLabel);
+            this.threeDViewPanel.Controls.Add(this.glViewer);
+            this.threeDViewPanel.Location = new System.Drawing.Point(396, 142);
+            this.threeDViewPanel.Name = "threeDViewPanel";
+            this.threeDViewPanel.Size = new System.Drawing.Size(400, 400);
+            this.threeDViewPanel.TabIndex = 15;
+            // 
             // viewlLabel
             // 
             this.viewlLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -121,16 +133,6 @@
             this.viewlLabel.Size = new System.Drawing.Size(47, 13);
             this.viewlLabel.TabIndex = 14;
             this.viewlLabel.Text = "3D View";
-            // 
-            // threeDViewPanel
-            // 
-            this.threeDViewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.threeDViewPanel.Controls.Add(this.viewlLabel);
-            this.threeDViewPanel.Controls.Add(this.glViewer);
-            this.threeDViewPanel.Location = new System.Drawing.Point(396, 142);
-            this.threeDViewPanel.Name = "threeDViewPanel";
-            this.threeDViewPanel.Size = new System.Drawing.Size(400, 400);
-            this.threeDViewPanel.TabIndex = 15;
             // 
             // glViewer
             // 
@@ -152,6 +154,17 @@
             this.glViewer.Size = new System.Drawing.Size(392, 394);
             this.glViewer.StencilBits = ((byte)(0));
             this.glViewer.TabIndex = 0;
+            // 
+            // addUser
+            // 
+            this.addUser.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.addUser.Image = ((System.Drawing.Image)(resources.GetObject("addUser.Image")));
+            this.addUser.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.addUser.Name = "addUser";
+            this.addUser.Size = new System.Drawing.Size(36, 36);
+            this.addUser.Text = "toolStripButton1";
+            this.addUser.ToolTipText = "Register a user";
+            this.addUser.Click += new System.EventHandler(this.addUser_Click);
             // 
             // Interface
             // 
@@ -186,6 +199,7 @@
         private GLViewer glViewer;
         private System.Windows.Forms.Label viewlLabel;
         private System.Windows.Forms.Panel threeDViewPanel;
+        private System.Windows.Forms.ToolStripButton addUser;
 	}
 }
 

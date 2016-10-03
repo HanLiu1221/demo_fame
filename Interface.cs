@@ -100,7 +100,7 @@ namespace FameBase
 
         private void set_1_Click(object sender, EventArgs e)
         {
-            string folderName = @"C:\scratch\HLiu\Fame\data_sets\mix_4";
+            string folderName = ".\\mix_4";
             //string folderName = @"E:\Projects\fame\data_sets\mix_4";
             List<ModelViewer> _modelViews = this.glViewer.loadPartBasedModels(folderName);
             layoutModelSet(_modelViews, true);
@@ -108,8 +108,8 @@ namespace FameBase
 
         private void set_2_Click(object sender, EventArgs e)
         {
-            //string folderName = @"C:\scratch\HLiu\Fame\data_sets\mix_4";
-            string folderName = @"E:\Projects\fame\data_sets\mix_4";
+            string folderName = ".\\mix_4";
+            //string folderName = @"E:\Projects\fame\data_sets\mix_4";
             List<ModelViewer> _modelViews = this.glViewer.loadPartBasedModels(folderName);
             layoutModelSet(_modelViews, true);
         }
@@ -175,6 +175,12 @@ namespace FameBase
                     break;
             }
             return c;
+        }
+
+        private void addUser_Click(object sender, EventArgs e)
+        {
+            int uidx = this.glViewer.registerANewUser();
+            MessageBox.Show("Hello! You are the " + uidx.ToString() + " users.");
         }
 	}// Interface
 }// namespace

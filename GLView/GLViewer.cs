@@ -151,7 +151,7 @@ namespace FameBase
         private List<Model> _crossOverBasket = new List<Model>();
         private int _selectedModelIndex = -1;
         
-        public string foldername;
+        public string foldername = ".\\mix_4";
         private Vector3d objectCenter = new Vector3d();
         private int meshIdx = 0;
 
@@ -186,6 +186,11 @@ namespace FameBase
         private int _currIter = 0;
         private int _mutateOrCross = -1;
         private bool _showContactPoint = false;
+
+        List<List<Model>> _mutateGenerations = new List<List<Model>>();
+        List<List<Model>> _crossoverGenerations = new List<List<Model>>();
+        List<ModelViewer> _currGenModelViewers = new List<ModelViewer>();
+        List<Model> _currGen = new List<Model>();
 
         /******************** Functions ********************/
 
@@ -766,7 +771,7 @@ namespace FameBase
                 MessageBox.Show("File does not exist!");
                 return;
             }
-            this.foldername = Path.GetDirectoryName(filename);
+            //this.foldername = Path.GetDirectoryName(filename);
             this.clearHighlights();
             _currModel = this.loadOnePartBasedModel(filename);
             string graphName = filename.Substring(0, filename.LastIndexOf('.')) + ".graph";
@@ -814,7 +819,7 @@ namespace FameBase
                 MessageBox.Show("Directory does not exist!");
                 return null;
             }
-            this.foldername = segfolder;
+            //this.foldername = segfolder;
             this.clearContext();
             this.clearHighlights();
             string[] files = Directory.GetFiles(segfolder);
@@ -1321,6 +1326,10 @@ namespace FameBase
             {
                 mv.Refresh();
             }
+            foreach (ModelViewer mv in _currGenModelViewers)
+            {
+                mv.Refresh();
+            }
         }// refreshModelViewers
 
         public void setCurrentModel(Model m, int idx)
@@ -1701,18 +1710,88 @@ namespace FameBase
             }
         }// dfs_files
 
-        List<List<Model>> _mutateGenerations = new List<List<Model>>();
-        List<List<Model>> _crossoverGenerations = new List<List<Model>>();
-        List<ModelViewer> _currGenModelViewers = new List<ModelViewer>();
-        List<Model> _currGen = new List<Model>();
-
         public int getParentModelNum()
         {
             return _ancesterModelViewers.Count;
         }
 
+        // save folders
+        string userFolder = "";
+        string mutateFolder = "";
+        string crossoverFolder = "";
+        string growthFolder = "";
+        string imageFolder_m = "";
+        string imageFolder_c = "";
+        string imageFolder_g = "";
+        int _userIndex = 1;
+
+        public int registerANewUser()
+        {
+            string root = this.foldername.Clone() as string;
+            _userIndex = 1;
+            userFolder = root + "\\user_" + _userIndex.ToString();
+            while (Directory.Exists(userFolder))
+            {
+                // create a new folder for the new user
+                ++_userIndex;
+                userFolder = root + "\\User_" + _userIndex.ToString();
+            }
+            Directory.CreateDirectory(userFolder);
+
+            mutateFolder = userFolder + "\\models\\mutate\\";
+            crossoverFolder = userFolder + "\\models\\crossover\\";
+            growthFolder = userFolder + "\\models\\growth\\";
+
+            createDirectory(mutateFolder);
+            createDirectory(crossoverFolder);
+            createDirectory(growthFolder);
+
+            imageFolder_m = userFolder + "\\screenCapture\\mutate\\";
+            imageFolder_c = userFolder + "\\screenCapture\\crossover\\";
+            imageFolder_g = userFolder + "\\screenCapture\\growth\\";
+
+            createDirectory(imageFolder_m);
+            createDirectory(imageFolder_c);
+            createDirectory(imageFolder_g);
+
+            return _userIndex;
+        }// registerANewUser
+
+        private void createDirectory(string folder)
+        {
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+        }
+
+        private void saveUserSelections(int gen)
+        {
+            string dir = userFolder + "\\selections";
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            string selectionTxt = dir + "\\gen_" + gen.ToString() + ".txt";
+            using (StreamWriter sw = new StreamWriter(selectionTxt))
+            {
+                sw.WriteLine("User " + _userIndex.ToString());
+                sw.WriteLine("Generation " + gen.ToString());
+                foreach (Model model in _currGen)
+                {
+                    sw.WriteLine(model._path + model._model_name);
+                }
+            }
+        }// saveUserSelections
+
         public List<ModelViewer> autoGenerate()
         {
+            if (!Directory.Exists(userFolder))
+            {
+                MessageBox.Show("Please click the registration button first. Thanks!");
+                return null;
+            }
+
             this.isDrawBbox = false;
             this.isDrawGraph = false;
             this.isDrawGround = true;
@@ -1722,32 +1801,19 @@ namespace FameBase
 
             List<Model> parents = new List<Model>();
             List<Model> prev_parents = new List<Model>(_currGen);
-            // always include the parent models
+            // always include the ancient models
             foreach (ModelViewer mv in _ancesterModelViewers)
             {
                 parents.Add(mv._MODEL);
             }
             _currGenModelViewers.Clear();
+            // add user selected models
+            if (_currIter > 0)
+            {
+                this.saveUserSelections(_currIter);
+            }
             parents.AddRange(_currGen);
 
-            string mutateFolder = this.foldername.Clone() as string;
-            string crossoverFolder = this.foldername.Clone() as string;
-            string grwothFolder = this.foldername.Clone() as string;
-            string imageFolder_m = mutateFolder + "\\screenCapture\\mutate\\";
-            string imageFolder_c = crossoverFolder + "\\screenCapture\\crossover\\";
-            string imageFolder_g = grwothFolder + "\\screenCapture\\growth\\";
-            if (!Directory.Exists(imageFolder_m))
-            {
-                Directory.CreateDirectory(imageFolder_m);
-            }
-            if (!Directory.Exists(imageFolder_c))
-            {
-                Directory.CreateDirectory(imageFolder_c);
-            }
-            if (!Directory.Exists(imageFolder_g))
-            {
-                Directory.CreateDirectory(imageFolder_g);
-            }
             Random rand = new Random();
             _mutateOrCross = runMutateOrCrossover(rand);
             
@@ -1791,7 +1857,7 @@ namespace FameBase
             {
                 return growth;
             }
-            string path = this.foldername + "\\models\\growth\\gen_" + gen.ToString() + "\\";
+            string path = growthFolder + "gen_" + gen.ToString() + "\\";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -1973,7 +2039,7 @@ namespace FameBase
                 return mutated;
             }
             Random rand = new Random();
-            string path = this.foldername + "\\models\\mutate\\gen_" + gen.ToString() + "\\";
+            string path = mutateFolder + "gen_" + gen.ToString() + "\\";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -2244,8 +2310,8 @@ namespace FameBase
 
             Model newM1 = m1.Clone() as Model;
             Model newM2 = m2.Clone() as Model;
-            newM1._path = this.foldername + "\\models\\crossover\\gen_" + gen.ToString() + "\\";
-            newM2._path = this.foldername + "\\models\\crossover\\gen_" + gen.ToString() + "\\";
+            newM1._path = crossoverFolder + "gen_" + gen.ToString() + "\\";
+            newM2._path = crossoverFolder + "gen_" + gen.ToString() + "\\";
             if (!Directory.Exists(newM1._path))
             {
                 Directory.CreateDirectory(newM1._path);
@@ -3496,9 +3562,6 @@ namespace FameBase
             this.highlightQuad = null;
             _isRightClick = e.Button == System.Windows.Forms.MouseButtons.Right;
 
-            this.ContextMenuStrip = Program.GetFormMain().getRightButtonMenu();
-            this.ContextMenuStrip.Hide();
-
             switch (this.currUIMode)
             {
                 case UIMode.VertexSelection:
@@ -4443,6 +4506,10 @@ namespace FameBase
                 new Vector3d() - this.objectCenter);
 
             foreach (ModelViewer mv in _ancesterModelViewers)
+            {
+                mv.setModelViewMatrix(m);
+            }
+            foreach (ModelViewer mv in _currGenModelViewers)
             {
                 mv.setModelViewMatrix(m);
             }
