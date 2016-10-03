@@ -1,2 +1,2 @@
-# CGPlatform
-my C# platform, implementing basic 3D operations, and more..
+# demo_fame
+The demo of the fame project
