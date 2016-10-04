@@ -1880,7 +1880,7 @@ namespace FameBase
                     }
                     Model m2 = models[j];
                     Model model = addPlacement(m1, m2._GRAPH, path, idx, rand, gen);
-                    if (model != null)
+                    if (model != null && model._GRAPH != null && model._GRAPH.isValid())
                     {
                         growth.Add(model);
                         // screenshot
@@ -2066,7 +2066,7 @@ namespace FameBase
                 mutateANode(updateNode, rand);
                 deformPropagation(model._GRAPH, updateNode);
                 model._GRAPH.resetUpdateStatus();
-                if (!model._GRAPH.isViolateOrigin())
+                if (!model._GRAPH.isValid())
                 {
                     model._GRAPH.unify();
                     mutated.Add(model);
@@ -2146,7 +2146,7 @@ namespace FameBase
                     m_idx += 2;
                     foreach (Model m in results)
                     {
-                        if (!m._GRAPH.isViolateOrigin())
+                        if (!m._GRAPH.isValid())
                         {
                             m._GRAPH.unify();
                             crossed.Add(m);
