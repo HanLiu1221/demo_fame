@@ -84,13 +84,27 @@ namespace FameBase
 
         public void updateStats()
         {
-            // empty use
+            string stats = this.glViewer.getStats();
+            this.statsLabel.Text = stats;
+            this.Refresh();
         }
 
         public ContextMenuStrip getRightButtonMenu()
         {
             // empty use
             return null;
+        }
+
+        public void setCheckBox_drawBbox(bool isdraw)
+        {            
+        }
+
+        public void setCheckBox_drawGraph(bool isdraw)
+        {
+        }
+
+        public void setCheckBox_drawGround(bool isdraw)
+        {
         }
 
         public void writeToConsole(string s)
@@ -101,7 +115,7 @@ namespace FameBase
         private void set_1_Click(object sender, EventArgs e)
         {
             string folderName = ".\\mix_4";
-            //string folderName = @"E:\Projects\fame\data_sets\mix_4";
+            //string folderName = @"C:\scratch\HLiu\Fame\data_sets\mix_4";
             List<ModelViewer> _modelViews = this.glViewer.loadPartBasedModels(folderName);
             layoutModelSet(_modelViews, true);
         }
@@ -109,7 +123,7 @@ namespace FameBase
         private void set_2_Click(object sender, EventArgs e)
         {
             string folderName = ".\\mix_4";
-            //string folderName = @"E:\Projects\fame\data_sets\mix_4";
+            //string folderName = @"C:\scratch\HLiu\Fame\data_sets\mix_4";
             List<ModelViewer> _modelViews = this.glViewer.loadPartBasedModels(folderName);
             layoutModelSet(_modelViews, true);
         }
@@ -182,5 +196,6 @@ namespace FameBase
             int uidx = this.glViewer.registerANewUser();
             MessageBox.Show("Hello! You are the " + uidx.ToString() + " users.");
         }
+
 	}// Interface
 }// namespace

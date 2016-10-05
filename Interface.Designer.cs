@@ -30,15 +30,17 @@
 		{
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Interface));
             this.menu = new System.Windows.Forms.ToolStrip();
+            this.addUser = new System.Windows.Forms.ToolStripButton();
             this.set_1 = new System.Windows.Forms.ToolStripButton();
             this.set_2 = new System.Windows.Forms.ToolStripButton();
             this.run = new System.Windows.Forms.ToolStripButton();
             this.modelViewLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.viewPanel = new System.Windows.Forms.Panel();
+            this.manualLabel = new System.Windows.Forms.Label();
             this.threeDViewPanel = new System.Windows.Forms.Panel();
             this.viewlLabel = new System.Windows.Forms.Label();
             this.glViewer = new FameBase.GLViewer();
-            this.addUser = new System.Windows.Forms.ToolStripButton();
+            this.statsLabel = new System.Windows.Forms.Label();
             this.menu.SuspendLayout();
             this.viewPanel.SuspendLayout();
             this.threeDViewPanel.SuspendLayout();
@@ -57,6 +59,17 @@
             this.menu.Size = new System.Drawing.Size(796, 39);
             this.menu.TabIndex = 0;
             this.menu.Text = "toolStrip1";
+            // 
+            // addUser
+            // 
+            this.addUser.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.addUser.Image = ((System.Drawing.Image)(resources.GetObject("addUser.Image")));
+            this.addUser.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.addUser.Name = "addUser";
+            this.addUser.Size = new System.Drawing.Size(36, 36);
+            this.addUser.Text = "toolStripButton1";
+            this.addUser.ToolTipText = "Register a user";
+            this.addUser.Click += new System.EventHandler(this.addUser_Click);
             // 
             // set_1
             // 
@@ -96,9 +109,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.modelViewLayoutPanel.AutoScroll = true;
             this.modelViewLayoutPanel.BackColor = System.Drawing.Color.White;
-            this.modelViewLayoutPanel.Location = new System.Drawing.Point(3, 3);
+            this.modelViewLayoutPanel.Location = new System.Drawing.Point(6, 3);
             this.modelViewLayoutPanel.Name = "modelViewLayoutPanel";
-            this.modelViewLayoutPanel.Size = new System.Drawing.Size(793, 539);
+            this.modelViewLayoutPanel.Size = new System.Drawing.Size(790, 539);
             this.modelViewLayoutPanel.TabIndex = 13;
             // 
             // viewPanel
@@ -106,6 +119,7 @@
             this.viewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.viewPanel.Controls.Add(this.manualLabel);
             this.viewPanel.Controls.Add(this.threeDViewPanel);
             this.viewPanel.Controls.Add(this.modelViewLayoutPanel);
             this.viewPanel.Location = new System.Drawing.Point(0, 42);
@@ -113,9 +127,22 @@
             this.viewPanel.Size = new System.Drawing.Size(796, 542);
             this.viewPanel.TabIndex = 17;
             // 
+            // manualLabel
+            // 
+            this.manualLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.manualLabel.AutoSize = true;
+            this.manualLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.manualLabel.Location = new System.Drawing.Point(3, 461);
+            this.manualLabel.Name = "manualLabel";
+            this.manualLabel.Size = new System.Drawing.Size(192, 78);
+            this.manualLabel.TabIndex = 0;
+            this.manualLabel.Text = "Manual:\r\n1. click the first button to register a user\r\n2. load a set\r\n3. click \"R" +
+    "UN\"\r\n4. click on preferred shapes\r\n5. repeat 3-4 until satisfied.\r\n";
+            // 
             // threeDViewPanel
             // 
             this.threeDViewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.threeDViewPanel.Controls.Add(this.statsLabel);
             this.threeDViewPanel.Controls.Add(this.viewlLabel);
             this.threeDViewPanel.Controls.Add(this.glViewer);
             this.threeDViewPanel.Location = new System.Drawing.Point(396, 142);
@@ -155,16 +182,15 @@
             this.glViewer.StencilBits = ((byte)(0));
             this.glViewer.TabIndex = 0;
             // 
-            // addUser
+            // statsLabel
             // 
-            this.addUser.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.addUser.Image = ((System.Drawing.Image)(resources.GetObject("addUser.Image")));
-            this.addUser.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.addUser.Name = "addUser";
-            this.addUser.Size = new System.Drawing.Size(36, 36);
-            this.addUser.Text = "toolStripButton1";
-            this.addUser.ToolTipText = "Register a user";
-            this.addUser.Click += new System.EventHandler(this.addUser_Click);
+            this.statsLabel.AutoSize = true;
+            this.statsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.statsLabel.Location = new System.Drawing.Point(8, 7);
+            this.statsLabel.Name = "statsLabel";
+            this.statsLabel.Size = new System.Drawing.Size(34, 13);
+            this.statsLabel.TabIndex = 16;
+            this.statsLabel.Text = "Stats:";
             // 
             // Interface
             // 
@@ -180,6 +206,7 @@
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
             this.viewPanel.ResumeLayout(false);
+            this.viewPanel.PerformLayout();
             this.threeDViewPanel.ResumeLayout(false);
             this.threeDViewPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -200,6 +227,8 @@
         private System.Windows.Forms.Label viewlLabel;
         private System.Windows.Forms.Panel threeDViewPanel;
         private System.Windows.Forms.ToolStripButton addUser;
+        private System.Windows.Forms.Label manualLabel;
+        private System.Windows.Forms.Label statsLabel;
 	}
 }
 

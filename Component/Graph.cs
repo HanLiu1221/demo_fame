@@ -145,6 +145,19 @@ namespace Component
             return vals;
         }// calScale
 
+        public List<Node> getNodesByUniqueFunctionality(Common.Functionality func)
+        {
+            List<Node> nodes = new List<Node>();
+            foreach (Node node in _nodes)
+            {
+                if (node._funcs.Count == 1 && node._funcs.Contains(func))
+                {
+                    nodes.Add(node);
+                }
+            }
+            return nodes;
+        }// getNodesByUniqueFunctionality
+
         public List<Node> getNodesByFunctionality(Common.Functionality func)
         {
             List<Node> nodes = new List<Node>();
@@ -372,7 +385,7 @@ namespace Component
             return edges;
         }// GetInnerEdges
 
-        public static List<Node> GetNodePropagation(List<Node> nodes)
+        public List<Node> getNodePropagation(List<Node> nodes)
         {
             // propagate the nodes to all inner nodes that only connect to the input #nodes#
             List<Node> inner_nodes = new List<Node>();
@@ -385,10 +398,11 @@ namespace Component
                     {
                         continue;
                     }
+                    // check if #adj# is an innter node
                     bool add = true;
                     foreach (Node adjadj in adj._adjNodes)
                     {
-                        if (!nodes.Contains(adjadj))
+                        if (!inner_nodes.Contains(adjadj))
                         {
                             add = false;
                             break;
@@ -914,6 +928,12 @@ namespace Component
             }
         }// resetEdgeContactStatus
 
+        public void reset()
+        {
+            resetNodeIndex();
+            resetUpdateStatus();
+        }// reset
+
         public void unify()
         {
             Vector3d maxCoord = Vector3d.MinCoord;
@@ -928,7 +948,6 @@ namespace Component
             maxS = maxS > scale.z ? maxS : scale.z;
             maxS = 1.0 / maxS;
             Vector3d center = (maxCoord + minCoord) / 2;
-            center = new Vector3d() - center;
             Matrix4d T = Matrix4d.TranslationMatrix(center);
             Matrix4d S = Matrix4d.ScalingMatrix(new Vector3d(maxS, maxS, maxS));
             Matrix4d Q = T * S * Matrix4d.TranslationMatrix(new Vector3d() - center);
@@ -939,13 +958,12 @@ namespace Component
             {
                 minCoord = Vector3d.Min(minCoord, node._PART._MESH.MinCoord);
             }
-            if (Math.Abs(minCoord.y) > Common._thresh)
-            {
-                Vector3d t = new Vector3d();
+       
+                Vector3d t = new Vector3d() - center;
                 t.y = -minCoord.y;
                 T = Matrix4d.TranslationMatrix(t);
                 this.transformAll(T);
-            }
+            
         }// unify
 
         private void transformAll(Matrix4d T)
@@ -963,6 +981,62 @@ namespace Component
             }
             resetUpdateStatus();
         }// transformAll
+
+        public void cloneSubgraph(List<Node> nodes, out List<Node> clone_nodes, out List<Edge> clone_edges)
+        {
+            clone_nodes = new List<Node>();
+            clone_edges = new List<Edge>();
+            List<Edge> visited = new List<Edge>();
+            foreach (Node node in nodes)
+            {
+                Node cloned = node.Clone() as Node;
+                clone_nodes.Add(cloned);
+            }
+            for (int i = 0; i < nodes.Count; ++i)
+            {
+                Node node = nodes[i];
+                Node cloned = clone_nodes[i];
+                foreach (Edge e in node._edges)
+                {
+                    if (visited.Contains(e))
+                    {
+                        continue;
+                    }
+                    Node adj = e._start == node ? e._end : e._start;
+                    int idx = nodes.IndexOf(adj);
+                    if (idx != -1)
+                    {
+                        Node adj_cloned = clone_nodes[idx];
+                        List<Contact> contacts = new List<Contact>();
+                        foreach (Contact c in e._contacts)
+                        {
+                            contacts.Add(new Contact(new Vector3d(c._pos3d)));
+                        }
+                        Edge cloned_e = new Edge(cloned, adj_cloned, contacts);
+                        clone_edges.Add(cloned_e);
+                    }
+                    visited.Add(e);
+                }
+            }
+        }// cloneSubgraph
+
+        public Node getNodeToAttach()
+        {
+            double minz = double.MaxValue;
+            Node attach = null;
+            foreach (Node node in _nodes)
+            {
+                if (node._funcs.Contains(Common.Functionality.HUMAN_BACK) || node._funcs.Contains(Common.Functionality.HAND_PLACE))
+                {
+                    if (node._PART._MESH.MinCoord.z < minz)
+                    {
+                        minz = node._PART._MESH.MinCoord.z;
+                        attach = node;
+                    }
+                }
+            }
+            return attach;
+        }// getNodeToAttach
 
         //*********** Validation ***********//
         public bool isValid()
@@ -1009,23 +1083,36 @@ namespace Component
                 if (node._funcs.Contains(Common.Functionality.GROUND_TOUCHING))
                 {
                     groundPnts.Add(node._PART._BOUNDINGBOX.MinCoord);
+                    groundPnts.Add(node._PART._BOUNDINGBOX.MaxCoord);
                 }
             }
             centerOfMass /= _NNodes;
             Vector2d center = new Vector2d(centerOfMass.x, centerOfMass.z);
-            int i = 0;
-            Vector2d[] groundPnts2d = new Vector2d[groundPnts.Count];
+            Vector2d minCoord = Vector2d.MaxCoord();
+            Vector2d maxCoord = Vector2d.MinCoord();
             foreach (Vector3d v in groundPnts)
             {
-                groundPnts2d[i++] = new Vector2d(v.x, v.z);
+                Vector2d v2 = new Vector2d(v.x, v.z);
+                minCoord = Vector2d.Min(v2, minCoord);
+                maxCoord = Vector2d.Max(v2, maxCoord);
             }
-            foreach (Vector2d v in centers2d)
+            // in case some model only has 2 ground touching points
+            Vector2d[] groundPnts2d = new Vector2d[4];
+            groundPnts2d[0] = new Vector2d(minCoord.x, minCoord.y);
+            groundPnts2d[1] = new Vector2d(minCoord.x, maxCoord.y);
+            groundPnts2d[2] = new Vector2d(maxCoord.x, maxCoord.y);
+            groundPnts2d[3] = new Vector2d(maxCoord.x, minCoord.y);
+            if (!Polygon2D.isPointInPolygon(center, groundPnts2d))
             {
-                if (!Polygon2D.isPointInPolygon(center, groundPnts2d))
-                {
-                    return false;
-                }
+                return false;
             }
+            //foreach (Vector2d v in centers2d)
+            //{
+            //    if (!Polygon2D.isPointInPolygon(v, groundPnts2d))
+            //    {
+            //        return false;
+            //    }
+            //}
             return true;
         }// isPhysicalValid
 

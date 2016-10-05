@@ -12,7 +12,7 @@ namespace FameBase
 {
     public class ModelViewer : SimpleOpenGlControl
     {
-        public ModelViewer(Model m, int idx, GLViewer glViewer, int gen) 
+        public ModelViewer(Model m, int idx, GLViewer glViewer, int gen)
         {
             this.InitializeComponent();
             this.InitializeContexts();
@@ -39,11 +39,11 @@ namespace FameBase
         int _idx = -1;
         Matrix4d _modelViewMat = Matrix4d.IdentityMatrix();
         Vector3d _eye = new Vector3d(0, 0, 1.5);
-        float[] back_color = {1.0f, 1.0f, 1.0f};
+        float[] back_color = { 1.0f, 1.0f, 1.0f };
         // 0: ancester
         // 1: last parent
         // > 1: children
-        private int _gen = -1; 
+        private int _gen = -1;
 
         public void setModelViewMatrix(Matrix4d m)
         {
